@@ -3,22 +3,48 @@
 const express = require('express');
 const path = require("path");
 const subscriber = require("./models/subscribers");
+const { cwd } = require('process');
+
 
 // create an express application
 const app = express()
 
 
 // to use static file we need to give permission of the public folder
-app.use(express.static("public"));
+app.use(express.static  (path.join(cwd(),"public")));
+
 // Parse JSON bodies (as sent by API clients)
+
+
+const mongoose = require('mongoose')
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 
-//API to render Html file
-app.get("/", (req,res) => {
-    res.sendFile(path.join(__dirname,"/index.html"));
-});
+require( "dotenv").config();
+
+const uri=process.env.MONGO_URI
+
+// configuration of env
+
+// Parse JSON bodies (as sent by API clients)
+
+// Connect to DATABASE
+// Local URI
+// const DATABASE_URL = "mongodb://localhost/subscribers";
+
+// Connect to MongoDB using Mongoose
+// const DATABASE_URL = process.env.DATABASE_URI;
+mongoose.connect(uri,{ useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection
+
+// If an error ccurs during connection, handle and log the error
+ db.on('error', (err) => console.log(err))
+
+// If the connection is successful, log a success message
+db.once('open', () => console.log('connected to database'))
 
 
 // API to get all data of subscribers
